@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import {TouchIntent,AdaptiveQuality} from '../src/experience.js';
+const touch=new TouchIntent(),hit={x:2,z:3};
+touch.begin(1,100,100,hit);assert.equal(touch.move(1,103,103),null);assert.deepEqual(touch.end(1).hit,hit);
+touch.begin(1,100,100,hit);assert.ok(touch.move(1,109,100));assert.equal(touch.end(1),null);
+touch.begin(1,100,100,hit);touch.clear();assert.equal(touch.end(1),null,'second finger cancels pending impulse');
+touch.begin(1,100,100,hit);assert.equal(touch.end(1,true),null,'pointer cancellation never creates a ripple');
+const q=new AdaptiveQuality(true,3);assert.equal(q.ratio,1.4);
+for(let i=0;i<3;i++)assert.equal(q.sample(25),false);assert.equal(q.sample(25),true);const low=q.ratio;
+for(let i=0;i<11;i++)assert.equal(q.sample(60),false);assert.equal(q.sample(60),true);assert.ok(q.ratio>low);
+for(let i=0;i<1000;i++)q.sample(20);assert.equal(q.ratio,.7);
+for(let i=0;i<1000;i++)q.sample(60);assert.equal(q.ratio,1.4);
+q.setMode('eco');assert.equal(q.ratio,1);for(let i=0;i<30;i++)assert.equal(q.sample(20),false);
+q.setMode('high');assert.equal(q.ratio,2);q.setMode('invalid');assert.equal(q.mode,'auto');
+console.log('PASS: touch tap/drag/pinch cancellation, adaptive quality hysteresis/recovery/bounds and manual tiers');
