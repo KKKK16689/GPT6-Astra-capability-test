@@ -1,0 +1,14 @@
+import {SPECIES} from './ecology.js';
+export function createReefUI(ecology,{onMode,onDensity,onSelect,onFollow,onStop}){
+ const root=document.createElement('section');root.id='reefTools';root.innerHTML=`<div class="reefbar"><label>交互模式 <select id="reefMode"><option value="water">触摸海洋</option><option value="orbit">自由观察</option><option value="inspect">观察生物</option><option value="feed">投喂</option></select></label><button id="atlasOpen">鱼类图鉴 · 11</button></div><div id="fishCard" hidden><strong id="fishName"></strong><p id="fishDescription"></p><button id="followFish">跟随这条鱼</button><button id="stopFollow">退出跟随</button><button id="closeFish">关闭</button></div>`;document.body.append(root);
+ const atlas=document.createElement('dialog');atlas.id='atlas';atlas.innerHTML=`<div class="atlashead"><div><small>FIELD NOTES / 01</small><h2>珊瑚礁居民</h2></div><button id="atlasClose" aria-label="关闭鱼类图鉴">×</button></div><p>微缩模型以典型外形与习性为灵感，非物种鉴定图谱。</p><label>鱼群密度 <input id="density" type="range" min="1" max="8" value="4"><output id="densityOut">44 条</output></label><p id="densityNote"></p><div class="fishgrid">${SPECIES.map(s=>`<button data-species="${s.index}"><svg viewBox="0 0 160 90" aria-hidden="true"><path d="M40 45 12 20 18 45 12 70Z" fill="${s.accent}"/><ellipse cx="85" cy="45" rx="${s.l*110}" ry="${s.h*90}" fill="${s.color}"/><path d="m60 35 20 -${s.h*80} 15 ${s.h*75}" fill="${s.accent}"/><circle cx="112" cy="39" r="4" fill="#143b38"/>${s.id==='clown'?'<path d="M65 27v36m22-38v40" stroke="#fff5dc" stroke-width="6"/>':''}</svg><strong>${s.name}</strong><span>${s.description}</span></button>`).join('')}</div>`;document.body.append(atlas);
+ const $=id=>document.getElementById(id);let selected=null,cap=4;
+ $('reefMode').onchange=e=>onMode(e.target.value);$('atlasOpen').onclick=()=>atlas.showModal();$('atlasClose').onclick=()=>atlas.close();
+ $('density').oninput=e=>onDensity(Number(e.target.value));
+ function select(f){onStop();selected=f;$('fishCard').hidden=!f;if(f){$('fishName').textContent=f.s.name;$('fishDescription').textContent=f.s.description;}}
+ atlas.querySelectorAll('[data-species]').forEach(b=>b.onclick=()=>{const f=ecology.sim.fish[Number(b.dataset.species)*8];onMode('inspect');onSelect(f);atlas.close();});
+ $('followFish').onclick=()=>{if(selected)onFollow(selected);};$('stopFollow').onclick=onStop;$('closeFish').onclick=()=>{onStop();select(null);};
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'){onStop();select(null);if(atlas.open)atlas.close();}});
+ $('stopFollow').hidden=true;
+ return{select,setMode(mode){$('reefMode').value=mode;},density(requested,max){cap=max;$('density').value=requested;$('densityOut').textContent=ecology.sim.perSpecies*11+' 条';$('densityNote').textContent=`当前档位上限 ${cap*11} 条；高密度设置在提升画质后生效。`;},following(on){$('followFish').hidden=on;$('stopFollow').hidden=!on;}};
+}
