@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "esbuild": "0.25.0",
+    "three": "0.170.0"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node tests/physics.test.mjs && node tests/experience.test.mjs && node tests/scene.test.mjs && node tests/ecology.test.mjs"
+  }
+}
