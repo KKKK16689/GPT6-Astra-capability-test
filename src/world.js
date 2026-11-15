@@ -173,6 +173,7 @@ export function createWorld(scene,shared) {
   const flagG=new T.BufferGeometry();flagG.setAttribute('position',new T.Float32BufferAttribute([0,2.03,-.10,0,1.84,-.10,0,1.96,.25],3));flagG.computeVertexNormals();boatMesh(flagG,mat('#4c9b92',{side:T.DoubleSide}));
   const rimPts=[];for(let i=0;i<60;i++){const pt=hull.getPoint(i/59);rimPts.push(V(pt.x,.055,pt.y));}boatMesh(new T.TubeGeometry(new T.CatmullRomCurve3(rimPts),60,.025,5,false),mats.red);
   let boatV=0,pitchV=0,rollV=0;
+  for(const z of [.2,1.45,2.8])for(const x of[-.36,.36]){const p=dp(x,-.6,z);obstacles.push({x:p.x,z:p.z,r:.075,top:.2});}
   const ecology=createEcology(scene,shared,[...obstacles,...reefSpots.map(([x,z])=>({x,z,r:.7,top:terrainHeight(x,z)+.9}))]);
   const bubbleCount=35,bubbleGeo=new T.SphereGeometry(1,8,6),bubbleMat=new T.MeshPhysicalMaterial({color:'#c9fff2',roughness:.04,metalness:.05,transparent:true,opacity:.38,depthWrite:false,clearcoat:1});
   const bubbles=new T.InstancedMesh(bubbleGeo,bubbleMat,bubbleCount),bubbleInfo=[];
@@ -209,5 +210,5 @@ export function createWorld(scene,shared) {
     scene.fog=new T.Fog(bg,39,110);windowMat.emissiveIntensity=(1-day)*2+.025;lamp.intensity=(1-day)*3.5;stars.material.opacity=(1-day)*.85;
     return{day,sunset,bg};
   }
-  return{ecology,setQuality(level){ecology.setQuality(level);grass.count=level==='eco'?90:level==='high'?230:160;bubbles.count=level==='eco'?12:level==='high'?35:24;},update,setTime,boat,lights:{key,hemi,fill},counts:{get fish(){return ecology.sim.perSpecies*11;},grass:230},resetBoat(){boat.position.y=.05;boat.rotation.x=boat.rotation.z=0;boatV=pitchV=rollV=0;}};
+  return{ecology,setQuality(level){ecology.setQuality(level);grass.count=level==='eco'?90:level==='high'?230:160;bubbles.count=level==='eco'?12:level==='high'?35:24;},update,setTime,boat,lights:{key,hemi,fill},counts:{get fish(){return ecology.sim.count;},grass:230},resetBoat(){boat.position.y=.05;boat.rotation.x=boat.rotation.z=0;boatV=pitchV=rollV=0;}};
 }
