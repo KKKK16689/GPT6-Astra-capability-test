@@ -6,6 +6,6 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "test": "node tests/physics.test.mjs && node tests/experience.test.mjs && node tests/scene.test.mjs && node tests/ecology.test.mjs"
+    "test": "node tests/physics.test.mjs && node tests/experience.test.mjs && node tests/scene.test.mjs && node tests/ecology.test.mjs && node tests/contacts.test.mjs"
   }
 }
